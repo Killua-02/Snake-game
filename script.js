@@ -9,5 +9,4 @@ for(let i=0;i<rows*cols;i++){
   const blocks=document.createElement('div');
   blocks.classList.add('block');
   board.append(blocks);
-
 }

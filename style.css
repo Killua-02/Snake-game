@@ -67,8 +67,6 @@ section{
   grid-template-rows: repeat(auto-fill, minmax(30px, 1fr));
 }
 
-
-
 .block {
   width: 30px;
   height: 30px;
