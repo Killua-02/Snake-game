@@ -13,6 +13,7 @@ body {
 :root {
   /*background-colors*/
   --primary-bg-color: #282828;
+  --primary-fill-color: #dcdcdc;
 
   /*text-colors*/
   --primary-text-color: #eeeeee;
@@ -71,4 +72,12 @@ section{
   width: 30px;
   height: 30px;
   border:1px solid var(--border-color);
+}
+
+.fill{
+  background-color: var(--primary-fill-color);
+}
+
+.food{
+  background-color: red;
 }
