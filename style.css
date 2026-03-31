@@ -14,6 +14,9 @@ body {
   /*background-colors*/
   --primary-bg-color: #282828;
   --primary-fill-color: #dcdcdc;
+  --primary-red-color: #ea1717;
+  --primary-green-color: #05d113;
+
 
   /*text-colors*/
   --primary-text-color: #eeeeee;
@@ -74,10 +77,14 @@ section{
   border:1px solid var(--border-color);
 }
 
-.fill{
+.block.fill{
   background-color: var(--primary-fill-color);
 }
 
 .food{
-  background-color: red;
+  background-color: var(--primary-red-color);
+}
+
+.block.head{
+  background-color: var(--primary-green-color);
 }
