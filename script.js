@@ -1,4 +1,8 @@
 const board = document.querySelector(".board");
+const startGameBtn = document.querySelector("#start-button");
+const restartGameBtn = document.querySelector("#restart-button");
+const startScreen = document.querySelector(".start-game");
+const restartScreen = document.querySelector(".game-over");
 const blockHeight = 30;
 const blockWidth = 30;
 
@@ -14,9 +18,11 @@ let highScore = Number(localStorage.getItem("highScore")) || 0;
 document.querySelector("#high-score").textContent = highScore;
 document.querySelector("#score").textContent = score;
 
+let timer = "00-00";
 let direction = "right";
-let lastDirection="right";
+let lastDirection = "right";
 let intervalId = null;
+let timeIntervalId = null;
 
 // Food object with random position
 const food = {
@@ -36,7 +42,6 @@ for (let i = 0; i < rows; i++) {
 
 // Function to render the snake and food on the board
 function render() {
-
   // Clear previous snake and food classes
   Object.values(blocks).forEach((block) => {
     block.classList.remove("fill", "head", "food");
@@ -58,7 +63,7 @@ function render() {
 }
 
 // Start the game loop
-intervalId=setInterval(() => {
+function gameLoop() {
   let head = null;
 
   // Update the head position based on the current direction
@@ -71,23 +76,20 @@ intervalId=setInterval(() => {
   } else if (direction === "down") {
     head = { x: snake[0].x + 1, y: snake[0].y };
   }
-  
 
   // Check for collisions with walls
-  if(head.x<0 || head.x>=rows || head.y<0 || head.y>=cols){
-    clearInterval(intervalId);
-    alert('Game Over!');
+  if (head.x < 0 || head.x >= rows || head.y < 0 || head.y >= cols) {
+    gameOver();
     return;
   }
 
   // Check for collisions with itself
-  snake.some((segment)=>{
-    if (head.x === segment.x && head.y === segment.y) {
-      clearInterval(intervalId);
-      alert('Game Over!');
-      return; // Exit the loop early
+  if(snake.some((segment) => {
+    (head.x === segment.x && head.y === segment.y) {
+      gameOver();
+      return;
     }
-  });
+  }));
 
   snake.unshift(head);
 
@@ -110,7 +112,58 @@ intervalId=setInterval(() => {
   }
   lastDirection = direction;
   render();
-}, 200);
+}
+
+// Timer loop to update the timer every second
+function timerLoop() {
+  let [min, sec] = timer.split("-").map(Number);
+  sec++;
+  if (sec === 60) {
+    min++;
+    sec = 0;
+  }
+  timer = `${String(min).padStart(2, "0")}-${String(sec).padStart(2, "0")}`;
+  document.querySelector("#time").textContent = timer;
+}
+
+// Start the game when the start button is clicked
+startGameBtn.addEventListener("click", () => {
+  intervalId = setInterval(gameLoop, 200);
+  startScreen.classList.add("hidden");
+  timeIntervalId = setInterval(timerLoop, 1000);
+});
+
+// Function to handle game over state
+function gameOver() {
+  clearInterval(intervalId);
+  clearInterval(timeIntervalId);
+  restartScreen.classList.remove("hidden");
+}
+
+restartGameBtn.addEventListener("click", () => {
+  //clear intervals and reset game state
+  clearInterval(intervalId);
+  clearInterval(timeIntervalId);
+  // Reset score, timer
+  score = 0;
+  timer = "00-00";
+  document.querySelector("#score").textContent = score;
+  document.querySelector("#time").textContent = timer;
+  // Reset direction
+  direction = "right";
+  lastDirection = "right";
+  // Reset snake position
+  snake.length = 0;
+  snake.push({ x: 3, y: 3 });
+  // Reset food position
+  food.x = Math.floor(Math.random() * rows);
+  food.y = Math.floor(Math.random() * cols);
+
+  restartScreen.classList.add("hidden");
+
+  intervalId = setInterval(gameLoop, 200);
+  timeIntervalId = setInterval(timerLoop, 1000);
+});
 
 // Listen for arrow key presses to change the snake's direction
 addEventListener("keydown", (event) => {
@@ -124,4 +177,3 @@ addEventListener("keydown", (event) => {
     direction = "down";
   }
 });
-
