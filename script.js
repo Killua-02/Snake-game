@@ -13,22 +13,30 @@ const blocks = [];
 const snake = [{ x: 3, y: 3 }];
 
 // Initialize score and high score
+let speed = 500;
 let score = 0;
 let highScore = Number(localStorage.getItem("highScore")) || 0;
 document.querySelector("#high-score").textContent = highScore;
 document.querySelector("#score").textContent = score;
 
-let timer = "00-00";
+let timer = "00:00";
 let direction = "right";
 let lastDirection = "right";
 let intervalId = null;
 let timeIntervalId = null;
 
 // Food object with random position
-const food = {
-  x: Math.floor(Math.random() * rows),
-  y: Math.floor(Math.random() * cols),
-};
+let food = generateFood();
+function generateFood() {
+  let food = {};
+  do {
+    food.x = Math.floor(Math.random() * rows);
+    food.y = Math.floor(Math.random() * cols);
+  } while (
+    snake.some((segment) => food.x === segment.x && food.y === segment.y)
+  );
+  return food;
+}
 
 // Create the grid and store references to each block
 for (let i = 0; i < rows; i++) {
@@ -43,9 +51,9 @@ for (let i = 0; i < rows; i++) {
 // Function to render the snake and food on the board
 function render() {
   // Clear previous snake and food classes
-  Object.values(blocks).forEach((block) => {
-    block.classList.remove("fill", "head", "food");
-  });
+  for (let key in blocks) {
+    blocks[key].classList.remove("fill", "head", "food");
+  }
 
   // Render the snake segments
   snake.forEach((segment, index) => {
@@ -84,23 +92,27 @@ function gameLoop() {
   }
 
   // Check for collisions with itself
-  if(snake.some((segment) => {
-    (head.x === segment.x && head.y === segment.y) {
-      gameOver();
-      return;
-    }
-  }));
+  if (snake.some((segment) => head.x === segment.x && head.y === segment.y)) {
+    gameOver();
+    return;
+  }
 
   snake.unshift(head);
 
   // Check if the snake has eaten the food
   if (head.x === food.x && head.y === food.y) {
     blocks[`${food.x},${food.y}`].classList.remove("food");
-    food.x = Math.floor(Math.random() * rows);
-    food.y = Math.floor(Math.random() * cols);
+    food = generateFood();
+    // food.x = Math.floor(Math.random() * rows);
+    // food.y = Math.floor(Math.random() * cols);
 
     // Update score and high score
     score++;
+    if (score % 5 === 0 && speed > 100) {
+      speed -= 50;
+      clearInterval(intervalId);
+      intervalId = setInterval(gameLoop, speed);
+    }
     if (score > highScore) {
       highScore = score;
       localStorage.setItem("highScore", highScore);
@@ -116,19 +128,20 @@ function gameLoop() {
 
 // Timer loop to update the timer every second
 function timerLoop() {
-  let [min, sec] = timer.split("-").map(Number);
+  let [min, sec] = timer.split(":").map(Number);
   sec++;
   if (sec === 60) {
     min++;
     sec = 0;
   }
-  timer = `${String(min).padStart(2, "0")}-${String(sec).padStart(2, "0")}`;
+  timer = `${String(min).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
   document.querySelector("#time").textContent = timer;
 }
 
 // Start the game when the start button is clicked
 startGameBtn.addEventListener("click", () => {
-  intervalId = setInterval(gameLoop, 200);
+  let speed = 500;
+  intervalId = setInterval(gameLoop, speed);
   startScreen.classList.add("hidden");
   timeIntervalId = setInterval(timerLoop, 1000);
 });
@@ -146,7 +159,7 @@ restartGameBtn.addEventListener("click", () => {
   clearInterval(timeIntervalId);
   // Reset score, timer
   score = 0;
-  timer = "00-00";
+  timer = "00:00";
   document.querySelector("#score").textContent = score;
   document.querySelector("#time").textContent = timer;
   // Reset direction
@@ -156,12 +169,13 @@ restartGameBtn.addEventListener("click", () => {
   snake.length = 0;
   snake.push({ x: 3, y: 3 });
   // Reset food position
-  food.x = Math.floor(Math.random() * rows);
-  food.y = Math.floor(Math.random() * cols);
+  food = generateFood();
+  // food.x = Math.floor(Math.random() * rows);
+  // food.y = Math.floor(Math.random() * cols);
 
   restartScreen.classList.add("hidden");
 
-  intervalId = setInterval(gameLoop, 200);
+  intervalId = setInterval(gameLoop, speed);
   timeIntervalId = setInterval(timerLoop, 1000);
 });
 
