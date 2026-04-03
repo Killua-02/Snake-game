@@ -94,6 +94,7 @@ section {
   width: 30px;
   height: 30px;
   border: 1px solid var(--border-color);
+  border-radius:50%;
 }
 
 .block.fill {

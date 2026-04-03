@@ -13,7 +13,7 @@ const blocks = [];
 const snake = [{ x: 3, y: 3 }];
 
 // Initialize score and high score
-let speed = 500;
+let speed = 400;
 let score = 0;
 let highScore = Number(localStorage.getItem("highScore")) || 0;
 document.querySelector("#high-score").textContent = highScore;
@@ -140,7 +140,7 @@ function timerLoop() {
 
 // Start the game when the start button is clicked
 startGameBtn.addEventListener("click", () => {
-  let speed = 500;
+  let speed = 400;
   intervalId = setInterval(gameLoop, speed);
   startScreen.classList.add("hidden");
   timeIntervalId = setInterval(timerLoop, 1000);
